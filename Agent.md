@@ -11,7 +11,6 @@
 - **语言**: TypeScript 5.8.2
 - **样式**: CSS Modules
 - **图标**: React Icons 5.5.0
-- **GitHub 集成**: React GitHub Calendar 4.5.6
 - **代码规范**: ESLint 9.22.0
 
 ## 项目结构
@@ -52,7 +51,7 @@ vscode-portfolio/
 #### [next.config.ts](next.config.ts)
 - Next.js 框架配置文件
 - 配置图片域名白名单，允许加载外部图片资源
-- 支持 Cloudinary、GitHub、Imgur、Dev.to 等域名
+- 支持 Cloudinary、Imgur、Dev.to 等域名
 
 #### [tsconfig.json](tsconfig.json)
 - TypeScript 编译器配置
@@ -81,10 +80,6 @@ vscode-portfolio/
 #### [pages/projects.tsx](pages/projects.tsx)
 - 项目展示页面，使用 ProjectCard 组件展示个人项目
 
-#### [pages/github.tsx](pages/github.tsx)
-- GitHub 活动展示页面
-- 集成 GitHub 贡献图表和仓库信息
-
 #### [pages/articles.tsx](pages/articles.tsx)
 - 文章页面，从 Dev.to API 获取个人文章
 
@@ -109,7 +104,6 @@ vscode-portfolio/
 - **[ThemeInfo.tsx](components/ThemeInfo.tsx)**: 主题信息展示组件
 
 #### 内容组件
-- **[RepoCard.tsx](components/RepoCard.tsx)**: GitHub 仓库卡片组件
 - **[ProjectCard.tsx](components/ProjectCard.tsx)**: 项目展示卡片组件
 - **[ArticleCard.tsx](components/ArticleCard.tsx)**: 文章卡片组件
 - **[ContactCode.tsx](components/ContactCode.tsx)**: 联系信息代码展示组件
@@ -152,8 +146,6 @@ vscode-portfolio/
 ### [.env.example](.env.example)
 环境变量配置示例文件：
 - `DEV_TO_API_KEY`: Dev.to API 密钥
-- `GITHUB_API_KEY`: GitHub API 密钥
-- `NEXT_PUBLIC_GITHUB_USERNAME`: GitHub 用户名
 
 ## 功能特性
 
@@ -167,9 +159,7 @@ vscode-portfolio/
 - 移动端友好的交互设计
 
 ### 外部集成
-- GitHub API 集成：获取仓库信息和贡献数据
-- Dev.to API 集成：获取个人文章列表
-- React GitHub Calendar：展示贡献图表
+- Dev.to API ????????????
 
 ## 开发指南
 

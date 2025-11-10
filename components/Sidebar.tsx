@@ -4,7 +4,6 @@ import {
   VscAccount,
   VscSettings,
   VscMail,
-  VscGithubAlt,
   VscCode,
   VscFiles,
   VscEdit,
@@ -14,7 +13,6 @@ import styles from '@/styles/Sidebar.module.css';
 
 const sidebarTopItems = [
   { Icon: VscFiles, path: '/' },
-  { Icon: VscGithubAlt, path: '/github' },
   { Icon: VscCode, path: '/projects' },
   { Icon: VscEdit, path: '/articles' },
   { Icon: VscMail, path: '/contact' },
