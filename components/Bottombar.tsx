@@ -6,7 +6,6 @@ import {
   VscWarning,
   VscSourceControl,
 } from 'react-icons/vsc';
-import { SiNextdotjs } from 'react-icons/si';
 
 import styles from '@/styles/Bottombar.module.css';
 
@@ -55,18 +54,6 @@ const Bottombar = () => {
         </Frame>
       </div>
       <div className={styles.group}>
-        <Frame
-          className={styles.section}
-          display="flex"
-          alignItems="center"
-          gap="$2"
-          paddingX="$2"
-          paddingY="$1"
-          boxShadow="$in"
-        >
-          <SiNextdotjs className={styles.icon} />
-          <p>Powered by Next.js</p>
-        </Frame>
         <Frame
           className={styles.section}
           display="flex"

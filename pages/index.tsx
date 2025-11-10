@@ -9,10 +9,6 @@ export default function HomePage() {
 
   const codeLines = [
     { code: 'const HomePage = () => {', type: 'function' },
-    {
-      code: '  const [isLoaded, setIsLoaded] = useState(true);',
-      type: 'variable',
-    },
     { code: '  const developerInfo = {', type: 'variable' },
     { code: "    name: '复川',", type: 'array-item' },
     { code: "    role: '赛博调酒师',", type: 'array-item' },
@@ -24,19 +20,12 @@ export default function HomePage() {
       code: '    document.title = `${developerInfo.name} | Portfolio`;',
       type: 'return',
     },
-    { code: '    setIsLoaded(true);', type: 'function-call' },
     { code: '  }, []);', type: 'close' },
     { code: '', type: 'blank' },
     { code: '  return (', type: 'return-object' },
     { code: '    <main className="hero-container">', type: 'object-method' },
     { code: '      <h1>{developerInfo.name}</h1>', type: 'object-method' },
     { code: '      <p>{developerInfo.role}</p>', type: 'object-method' },
-    { code: '      <div className="cta">', type: 'object-method' },
-    {
-      code: '        <Link href="/projects">View Projects</Link>',
-      type: 'object-method',
-    },
-    { code: '      </div>', type: 'object-method' },
     { code: '    </main>', type: 'object-method' },
     { code: '  );', type: 'close' },
     { code: '};', type: 'close-function' },
