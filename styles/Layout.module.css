@@ -9,7 +9,7 @@
 .content {
   padding: 2rem;
   color: var(--text-color);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'Zpix', sans-serif;
   flex: 1;
   height: 85vh;
   overflow-y: auto;
