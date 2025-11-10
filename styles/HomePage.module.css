@@ -1,5 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 
+/* WebTUI Code Background */
+.codeBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 2lh 2ch; /* WebTUI character units */
+  overflow: hidden;
+  pointer-events: none;
+  white-space: pre;
+  opacity: 0.4;
+  filter: blur(0.3px);
+  font-family: 'Zpix', monospace;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -117,11 +135,14 @@
   transition: all 0.3s ease;
   position: relative;
   white-space: pre;
+  opacity: 0.6;
 }
 
 .highlightedLine {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 3px;
+  opacity: 1;
+  text-shadow: 0 0 8px rgba(var(--accent-color-rgb), 0.3);
 }
 
 .highlightedLine::before {
@@ -131,83 +152,77 @@
   left: -10px;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 2px;
   background: var(--accent-color);
   border-radius: 0 3px 3px 0;
+  opacity: 0.5;
 }
 
-/* Syntax Highlighting */
+/* Syntax Highlighting - Enhanced for Background */
 .function {
-  color: #c586c0;
+  color: rgba(197, 134, 192, 0.3);
 }
 
 .variable {
-  color: #9cdcfe;
+  color: rgba(156, 220, 254, 0.3);
 }
 
 .array-start,
 .array-end {
-  color: #dcdcaa;
+  color: rgba(220, 220, 170, 0.3);
 }
 
 .array-item {
-  color: #ce9178;
+  color: rgba(206, 145, 120, 0.3);
 }
 
 .nested-function {
-  color: #c586c0;
+  color: rgba(197, 134, 192, 0.3);
 }
 
 .return {
-  color: #dcdcaa;
+  color: rgba(220, 220, 170, 0.3);
 }
 
 .function-call {
-  color: #4ec9b0;
+  color: rgba(78, 201, 176, 0.3);
 }
 
 .close,
 .close-function {
-  color: #808080;
+  color: rgba(128, 128, 128, 0.3);
 }
 
 .return-object {
-  color: #9cdcfe;
+  color: rgba(156, 220, 254, 0.3);
 }
 
 .object-method {
-  color: #dcdcaa;
+  color: rgba(220, 220, 170, 0.3);
 }
 
 .comment {
-  color: #6a9955;
+  color: rgba(106, 153, 85, 0.3);
 }
 
 .blank {
   height: 20px;
 }
 
-.blankLineNumber {
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 10px 0 0;
+/* Highlighted line syntax colors - brighter */
+.highlightedLine.function,
+.highlightedLine .function {
+  color: rgba(197, 134, 192, 0.8);
 }
 
-.overlayGlow {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(var(--accent-color-rgb), 0.03) 0%,
-    rgba(0, 0, 0, 0) 70%
-  );
-  pointer-events: none;
-  z-index: 1;
+.highlightedLine.variable,
+.highlightedLine .variable {
+  color: rgba(156, 220, 254, 0.8);
+}
+
+.highlightedLine.array-item,
+.highlightedLine .array-item {
+  color: rgba(206, 145, 120, 0.8);
 }
 
 /* Information Section */

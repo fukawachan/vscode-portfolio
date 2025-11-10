@@ -1,3 +1,7 @@
+@layer base, utils, components;
+@import '@webtui/css/base.css';
+@import '@webtui/css/components/pre.css';
+
 @font-face {
   font-family: 'Zpix';
   src: url('/fonts/zpix.woff2') format('woff2'),

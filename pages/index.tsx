@@ -39,44 +39,19 @@ export default function HomePage() {
 
   return (
     <div className={styles.heroLayout}>
-      <div className={styles.container}>
-        <div className={styles.codeSection}>
-          <div className={styles.codeContainer}>
-            <div className={styles.editorContent}>
-              <div className={styles.lineNumbers}>
-                {codeLines.map((line, index) => (
-                  <div
-                    key={index}
-                    className={`${styles.lineNumber} ${
-                      line.type === 'blank' ? styles.blankLineNumber : ''
-                    } ${
-                      index === activeLineIndex ? styles.activeLine : ''
-                    }`}
-                  >
-                    {index + 1}
-                  </div>
-                ))}
-              </div>
-
-              <div className={styles.codeEditor}>
-                {codeLines.map((line, index) => (
-                  <div
-                    key={index}
-                    className={`${styles.codeLine} ${styles[line.type]} ${
-                      index === activeLineIndex ? styles.highlightedLine : ''
-                    }`}
-                  >
-                    {line.code}
-                  </div>
-                ))}
-              </div>
-
-              <div className={styles.overlayGlow}></div>
-            </div>
+      {/* WebTUI Code Text Background */}
+      <pre className={styles.codeBackground}>
+        {codeLines.map((line, index) => (
+          <div
+            key={index}
+            className={`${styles.codeLine} ${styles[line.type]} ${
+              index === activeLineIndex ? styles.highlightedLine : ''
+            }`}
+          >
+            {line.code || '\n'}
           </div>
-        </div>
-
-        </div>
+        ))}
+      </pre>
 
       <div className={styles.decorElements}>
         <div className={styles.codeFlare}></div>
