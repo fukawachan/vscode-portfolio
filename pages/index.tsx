@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { VscArrowRight } from 'react-icons/vsc';
 
 import styles from '@/styles/HomePage.module.css';
 
@@ -78,25 +76,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className={styles.infoSection}>
-          <h1 className={styles.developerName}>
-            Nitin <span className={styles.accentText}>Ranganath</span>
-          </h1>
-
-          <div className={styles.developerRole}>Full Stack Web Developer</div>
-
-          <p className={styles.bio}>
-            I build elegant, responsive web applications with modern
-            technologies. Focused on clean code and intuitive user experiences.
-          </p>
-
-          <div className={styles.actionLinks}>
-            <Link href="/projects" className={styles.primaryLink}>
-              View Projects <VscArrowRight />
-            </Link>
-          </div>
         </div>
-      </div>
 
       <div className={styles.decorElements}>
         <div className={styles.codeFlare}></div>
