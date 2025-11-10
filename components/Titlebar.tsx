@@ -3,6 +3,8 @@ import { TitleBar } from '@react95/core';
 
 import styles from '@/styles/Titlebar.module.css';
 
+const TITLE_TEXT = '复川 - Visual Studio Code';
+
 const menuItems = ['File', 'Edit', 'View', 'Go', 'Run', 'Terminal', 'Help'];
 
 const Titlebar = () => {
@@ -29,9 +31,12 @@ const Titlebar = () => {
     <TitleBar
       as="header"
       icon={iconContent}
-      title="复川 - Visual Studio Code"
+      title={TITLE_TEXT}
       className={styles.titlebar}
     >
+      <div className={styles.centerTitle} aria-hidden="true">
+        {TITLE_TEXT}
+      </div>
       <div className={styles.controls}>
         <TitleBar.OptionsBox className={styles.windowButtons}>
           <TitleBar.Minimize aria-label="Minimize window" />

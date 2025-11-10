@@ -11,3 +11,26 @@
 a {
   text-decoration: none;
 }
+
+/* === 注册 Zpix 自托管字体 === */
+@font-face {
+  font-family: 'Zpix';
+  src:
+          url('../public/fonts/zpix/Zpix.woff2') format('woff2'),
+          url('../public/fonts/zpix/Zpix.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap; /* 避免 FOIT */
+}
+
+/* === 全局字体栈（像素中文 + 拉丁 + fallback + emoji）=== */
+:root{
+  --font-pixel-ui: 'Zpix',
+  ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+  'PingFang SC','Hiragino Sans GB','Microsoft YaHei',
+  'Noto Sans CJK SC','Noto Sans','Helvetica Neue',
+  sans-serif, 'Apple Color Emoji','Segoe UI Emoji';
+}
+
+/* 全站使用像素字（希望整站像素风）*/
+html { font-family: var(--font-pixel-ui); }

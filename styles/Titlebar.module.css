@@ -1,6 +1,13 @@
 .titlebar {
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+  padding-block: 0.35rem;
+}
+
+.titlebar > :global(div:nth-of-type(2)) {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .leading {
@@ -45,6 +52,26 @@
 
 .windowButtons {
   margin-left: auto;
+}
+
+.centerTitle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-weight: 500;
+  font-size: calc(1rem + 2px);
+  line-height: 1.2;
+  letter-spacing: 1px;
+  text-shadow: 0.5px 0 white, 1.5px 0 white;
+  color: inherit;
+  text-align: center;
+  max-width: calc(100% - 8rem);
+  padding-inline: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media screen and (max-width: 900px) {

@@ -11,7 +11,7 @@ export default function HomePage() {
     { code: 'const HomePage = () => {', type: 'function' },
     { code: '  const developerInfo = {', type: 'variable' },
     { code: "    name: '复川',", type: 'array-item' },
-    { code: "    role: '赛博调酒师',", type: 'array-item' },
+    { code: "    role: 'Cyber Bartender',", type: 'array-item' },
     { code: "    bio: 'A believing heart is your magic'", type: 'array-item' },
     { code: '  };', type: 'array-end' },
     { code: '', type: 'blank' },
