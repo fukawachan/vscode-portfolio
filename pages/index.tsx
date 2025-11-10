@@ -15,13 +15,6 @@ export default function HomePage() {
     { code: "    bio: 'A believing heart is your magic'", type: 'array-item' },
     { code: '  };', type: 'array-end' },
     { code: '', type: 'blank' },
-    { code: '  useEffect(() => {', type: 'nested-function' },
-    {
-      code: '    document.title = `${developerInfo.name} | Portfolio`;',
-      type: 'return',
-    },
-    { code: '  }, []);', type: 'close' },
-    { code: '', type: 'blank' },
     { code: '  return (', type: 'return-object' },
     { code: '    <main className="hero-container">', type: 'object-method' },
     { code: '      <h1>{developerInfo.name}</h1>', type: 'object-method' },
