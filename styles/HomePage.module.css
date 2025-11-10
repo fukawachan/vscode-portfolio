@@ -108,12 +108,8 @@
     rgba(40, 44, 52, 0.95) 0%,
     rgba(30, 34, 42, 0.95) 100%
   );
-  border-top: 1px solid rgba(100, 255, 100, 0.4);
-  border-bottom: 1px solid rgba(100, 255, 100, 0.6);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(100, 255, 100, 0.2),
-    0 0 20px rgba(100, 255, 100, 0.15);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   margin: 0;
   display: flex;
   align-items: center;
@@ -163,7 +159,7 @@
 /* Right Panel Lower Section - Terminal Window */
 .rightPanelLower {
   flex: 1;
-  background-color: rgba(0, 16, 0, 0.85) !important;
+  background-color: rgba(0, 0, 0, 0.15) !important;
   color: rgba(100, 255, 100, 0.85);
   font-size: 12px;
   line-height: 1.4;
@@ -173,11 +169,8 @@
   font-family: 'Zpix', monospace;
   position: relative;
   box-sizing: border-box;
-  border: 2px solid rgba(100, 255, 100, 0.4);
-  border-top: none;
+  border: none;
   box-shadow:
-    0 0 20px rgba(100, 255, 100, 0.2),
-    inset 0 0 0 1px rgba(100, 255, 100, 0.1),
     inset 0 2px 4px rgba(0, 0, 0, 0.3),
     inset 0 0 100px rgba(0, 0, 0, 0.3);
   scrollbar-width: thin;
