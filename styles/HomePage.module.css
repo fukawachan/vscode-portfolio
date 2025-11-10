@@ -187,6 +187,12 @@
   height: 20px;
 }
 
+.blankLineNumber {
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
 .overlayGlow {
   position: absolute;
   top: 0;
