@@ -30,7 +30,13 @@ a {
   'PingFang SC','Hiragino Sans GB','Microsoft YaHei',
   'Noto Sans CJK SC','Noto Sans','Helvetica Neue',
   sans-serif, 'Apple Color Emoji','Segoe UI Emoji';
+  --latin-letter-spacing: 0.06em;
 }
 
 /* 全站使用像素字（希望整站像素风）*/
 html { font-family: var(--font-pixel-ui); }
+
+/* 微调英文字母间距，让字形不显拥挤 */
+body {
+  letter-spacing: var(--latin-letter-spacing);
+}
