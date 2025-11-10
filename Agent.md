@@ -26,7 +26,6 @@ vscode-portfolio/
 ├── public/               # 静态资源
 ├── styles/               # 样式文件
 ├── types/                # TypeScript 类型定义
-├── .env.example          # 环境变量示例
 ├── .gitignore            # Git 忽略配置
 ├── CODE_OF_CONDUCT.md    # 行为准则
 ├── LICENSE               # 许可证
@@ -51,7 +50,7 @@ vscode-portfolio/
 #### [next.config.ts](next.config.ts)
 - Next.js 框架配置文件
 - 配置图片域名白名单，允许加载外部图片资源
-- 支持 Cloudinary、Imgur、Dev.to 等域名
+- 支持 Cloudinary、Imgur 等域名
 
 #### [tsconfig.json](tsconfig.json)
 - TypeScript 编译器配置
@@ -80,9 +79,6 @@ vscode-portfolio/
 #### [pages/projects.tsx](pages/projects.tsx)
 - 项目展示页面，使用 ProjectCard 组件展示个人项目
 
-#### [pages/articles.tsx](pages/articles.tsx)
-- 文章页面，从 Dev.to API 获取个人文章
-
 #### [pages/contact.tsx](pages/contact.tsx)
 - 联系方式页面，展示各种联系方式和社交平台
 
@@ -105,7 +101,6 @@ vscode-portfolio/
 
 #### 内容组件
 - **[ProjectCard.tsx](components/ProjectCard.tsx)**: 项目展示卡片组件
-- **[ArticleCard.tsx](components/ArticleCard.tsx)**: 文章卡片组件
 - **[ContactCode.tsx](components/ContactCode.tsx)**: 联系信息代码展示组件
 
 #### 工具组件
@@ -120,7 +115,7 @@ vscode-portfolio/
 
 #### [types/index.ts](types/index.ts)
 - TypeScript 类型定义文件
-- 定义 Article、Project、Repo、User 等数据结构
+- 定义 Project 数据结构
 
 ### 样式文件 (styles/)
 
@@ -141,12 +136,6 @@ vscode-portfolio/
 - **[logos/](public/logos/)**: 项目和技能相关的 logo 文件
 - **[themes/](public/themes/)**: 主题相关的静态资源
 
-## 环境配置
-
-### [.env.example](.env.example)
-环境变量配置示例文件：
-- `DEV_TO_API_KEY`: Dev.to API 密钥
-
 ## 功能特性
 
 ### 主题系统
@@ -157,9 +146,6 @@ vscode-portfolio/
 ### 响应式设计
 - 适配不同屏幕尺寸
 - 移动端友好的交互设计
-
-### 外部集成
-- Dev.to API ????????????
 
 ## 开发指南
 
