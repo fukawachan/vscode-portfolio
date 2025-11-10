@@ -29,7 +29,7 @@ const Titlebar = () => {
     <TitleBar
       as="header"
       icon={iconContent}
-      title="Nitin Ranganath - Visual Studio Code"
+      title="复川 - Visual Studio Code"
       className={styles.titlebar}
     >
       <div className={styles.controls}>
