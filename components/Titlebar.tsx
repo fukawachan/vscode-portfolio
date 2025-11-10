@@ -1,33 +1,45 @@
 import Image from 'next/image';
+import { TitleBar } from '@react95/core';
 
 import styles from '@/styles/Titlebar.module.css';
 
+const menuItems = ['File', 'Edit', 'View', 'Go', 'Run', 'Terminal', 'Help'];
+
 const Titlebar = () => {
-  return (
-    <section className={styles.titlebar}>
+  const iconContent = (
+    <div className={styles.leading}>
       <Image
         src="/logos/vscode_icon.svg"
         alt="VSCode Icon"
-        height={15}
-        width={15}
+        height={18}
+        width={18}
         className={styles.icon}
       />
-      <div className={styles.items}>
-        <p>File</p>
-        <p>Edit</p>
-        <p>View</p>
-        <p>Go</p>
-        <p>Run</p>
-        <p>Terminal</p>
-        <p>Help</p>
+      <nav className={styles.items} aria-label="VS Code menu">
+        {menuItems.map((item) => (
+          <button key={item} type="button" className={styles.menuButton}>
+            {item}
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+
+  return (
+    <TitleBar
+      as="header"
+      icon={iconContent}
+      title="Nitin Ranganath - Visual Studio Code"
+      className={styles.titlebar}
+    >
+      <div className={styles.controls}>
+        <TitleBar.OptionsBox className={styles.windowButtons}>
+          <TitleBar.Minimize aria-label="Minimize window" />
+          <TitleBar.Maximize aria-label="Maximize window" />
+          <TitleBar.Close aria-label="Close window" />
+        </TitleBar.OptionsBox>
       </div>
-      <p className={styles.title}>Nitin Ranganath - Visual Studio Code</p>
-      <div className={styles.windowButtons}>
-        <span className={styles.minimize}></span>
-        <span className={styles.maximize}></span>
-        <span className={styles.close}></span>
-      </div>
-    </section>
+    </TitleBar>
   );
 };
 

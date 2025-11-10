@@ -1,48 +1,51 @@
 .bottomBar {
-  background: var(--bottombar-bg);
-  height: 25px;
-  border-top: 1px solid var(--bottombar-border);
-  color: rgb(225, 228, 232);
-  padding: 0 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
   font-size: 0.8rem;
+  gap: 0.5rem;
 }
 
-.bottomBar a {
-  color: white;
-  text-decoration: none;
-}
-
-.icon {
-  margin-right: 4px;
-}
-
-.container {
+.group {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .section {
-  display: flex;
-  margin-right: 0.5rem;
-  height: 24px;
-  align-items: center;
-  padding: 0 0.2rem;
-  cursor: pointer;
-  font-family: 'Source Sans Pro', sans-serif;
+  color: inherit;
+  text-decoration: none;
+  min-height: 24px;
+  border: none;
+  background: none;
+}
+
+.section p {
+  margin: 0;
 }
 
 .section:hover {
-  background: var(--bottombar-hover-bg);
+  text-decoration: underline;
+}
+
+.icon {
+  font-size: 0.9rem;
+}
+
+.errorText {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.warningText {
+  color: #a05a00;
+  font-weight: 600;
 }
 
 @media screen and (max-width: 600px) {
   .bottomBar {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
   }
-  .section {
-    margin-right: 0.5rem;
+  .section p {
+    display: none;
   }
 }

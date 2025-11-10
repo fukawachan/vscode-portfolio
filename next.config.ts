@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { hostname: 'imgur.com', protocol: 'https' },
     ],
   },
+  transpilePackages: ['@react95/core'],
 };
 
 export default nextConfig;

@@ -6,6 +6,8 @@ import Head from '@/components/Head';
 
 import '@/styles/globals.css';
 import '@/styles/themes.css';
+import '@react95/core/GlobalStyle';
+import '@react95/core/themes/win95.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {

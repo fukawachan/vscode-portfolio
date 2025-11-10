@@ -1,3 +1,4 @@
+import { Frame } from '@react95/core';
 import {
   VscBell,
   VscCheck,
@@ -11,38 +12,86 @@ import styles from '@/styles/Bottombar.module.css';
 
 const Bottombar = () => {
   return (
-    <footer className={styles.bottomBar}>
-      <div className={styles.container}>
-        <a
+    <Frame
+      as="footer"
+      className={styles.bottomBar}
+      backgroundColor="$material"
+      boxShadow="$out"
+      padding="$2"
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+    >
+      <div className={styles.group}>
+        <Frame
+          as="a"
           href="https://github.com/itsnitinr/vscode-portfolio"
           target="_blank"
           rel="noreferrer noopener"
           className={styles.section}
+          display="flex"
+          alignItems="center"
+          gap="$2"
+          paddingX="$2"
+          paddingY="$1"
+          boxShadow="$in"
         >
           <VscSourceControl className={styles.icon} />
           <p>main</p>
-        </a>
-        <div className={styles.section}>
+        </Frame>
+        <Frame
+          className={styles.section}
+          display="flex"
+          alignItems="center"
+          gap="$1"
+          paddingX="$2"
+          paddingY="$1"
+          boxShadow="$in"
+        >
           <VscError className={styles.icon} />
-          <p className={styles.errorText}>0</p>&nbsp;&nbsp;
+          <p className={styles.errorText}>0</p>
           <VscWarning className={styles.icon} />
-          <p>0</p>
-        </div>
+          <p className={styles.warningText}>0</p>
+        </Frame>
       </div>
-      <div className={styles.container}>
-        <div className={styles.section}>
+      <div className={styles.group}>
+        <Frame
+          className={styles.section}
+          display="flex"
+          alignItems="center"
+          gap="$2"
+          paddingX="$2"
+          paddingY="$1"
+          boxShadow="$in"
+        >
           <SiNextdotjs className={styles.icon} />
           <p>Powered by Next.js</p>
-        </div>
-        <div className={styles.section}>
+        </Frame>
+        <Frame
+          className={styles.section}
+          display="flex"
+          alignItems="center"
+          gap="$2"
+          paddingX="$2"
+          paddingY="$1"
+          boxShadow="$in"
+        >
           <VscCheck className={styles.icon} />
           <p>Prettier</p>
-        </div>
-        <div className={styles.section}>
+        </Frame>
+        <Frame
+          className={styles.section}
+          display="flex"
+          alignItems="center"
+          paddingX="$2"
+          paddingY="$1"
+          boxShadow="$in"
+          aria-label="Notifications"
+        >
           <VscBell />
-        </div>
+        </Frame>
       </div>
-    </footer>
+    </Frame>
   );
 };
 
