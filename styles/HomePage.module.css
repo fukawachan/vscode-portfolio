@@ -1,12 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 
-/* WebTUI Code Background */
-.codeBackground {
+/* WebTUI Code Background Container - Split Layout */
+.codeBackgroundContainer {
   position: absolute;
   inset: 0;
   z-index: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 2px; /* Minimal gap for visual separation */
+  padding: 0;
+  pointer-events: none;
+}
+
+/* WebTUI Code Background - Shared Styles */
+.codeBackground {
+  flex: 1;
+  z-index: 0;
   --pre-background: transparent;
-  background-color: transparent !important;
+  background-color: rgba(0, 0, 0, 0.15) !important;
   color: rgba(255, 255, 255, 0.06);
   font-size: 13px;
   line-height: 1.5;
@@ -14,8 +25,60 @@
   overflow: hidden;
   pointer-events: none;
   white-space: pre;
-  opacity: 0.7;
+  opacity: 1;
   font-family: 'Zpix', monospace;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Left Panel Styles */
+.leftPanel {
+  position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.leftPanel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -1px;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0.15) 80%,
+    transparent
+  );
+  border-radius: 1px;
+}
+
+/* Right Panel Styles */
+.rightPanel {
+  min-height: 100%;
+  position: relative;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Add distinct background panels with depth effect */
+.leftPanel::before,
+.rightPanel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  border-radius: 0;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .container {
@@ -135,7 +198,7 @@
   transition: all 0.3s ease;
   position: relative;
   white-space: pre;
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .highlightedLine {
@@ -365,6 +428,35 @@
     padding: 2rem;
   }
 
+  .codeBackgroundContainer {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .leftPanel {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .leftPanel::after {
+    display: none;
+  }
+
+  .rightPanel {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .leftPanel::before,
+  .rightPanel::before {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.03) 0%,
+      transparent 50%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+
   .codeSection {
     justify-self: center;
     width: 100%;
@@ -398,6 +490,16 @@
     grid-template-columns: 1fr;
   }
 
+  .codeBackgroundContainer {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .leftPanel,
+  .rightPanel {
+    font-size: 11px;
+  }
+
   .codeContainer {
     height: 380px;
     max-width: 100%;
@@ -423,7 +525,7 @@
     font-size: 1rem;
   }
 
-  
+
   .infoSection {
     text-align: center;
     align-items: center;

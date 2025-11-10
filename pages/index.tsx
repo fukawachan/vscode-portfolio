@@ -39,21 +39,28 @@ export default function HomePage() {
 
   return (
     <div className={styles.heroLayout}>
-      {/* WebTUI Code Text Background */}
-      <pre className={styles.codeBackground}>
-        {codeLines.map((line, index) => (
-          <div
-            key={index}
-            className={`${styles.codeLine} ${styles[line.type]} ${
-              index === activeLineIndex ? styles.highlightedLine : ''
-            }`}
-          >
-            {line.code || '\n'}
-          </div>
-        ))}
-      </pre>
+      {/* WebTUI Code Text Background - Split Layout */}
+      <div className={styles.codeBackgroundContainer}>
+        {/* Left Code Panel */}
+        <pre className={`${styles.codeBackground} ${styles.leftPanel}`}>
+          {codeLines.map((line, index) => (
+            <div
+              key={index}
+              className={`${styles.codeLine} ${styles[line.type]} ${
+                index === activeLineIndex ? styles.highlightedLine : ''
+              }`}
+            >
+              {line.code || '\n'}
+            </div>
+          ))}
+        </pre>
 
+        {/* Right Code Panel - Empty */}
+        <pre className={`${styles.codeBackground} ${styles.rightPanel}`}>
+          {/* Empty content area - placeholder for future content */}
+        </pre>
       </div>
+    </div>
   );
 }
 
