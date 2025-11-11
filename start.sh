@@ -1,133 +1,69 @@
 #!/bin/bash
 
-# Next.js Production Startup Script
-# 启动生产环境脚本
+# 设置变量
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_FILE="${SCRIPT_DIR}/log"
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-# 设置颜色输出
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# 检查是否在Next.js项目目录中
+if [ ! -f "package.json" ]; then
+    echo "错误：未找到package.json文件，请确保在Next.js项目根目录中运行此脚本"
+    exit 1
+fi
 
-# 项目信息
-PROJECT_NAME="vscode-portfolio"
-PID_FILE=".next/server.pid"
-LOG_DIR="logs"
-LOG_FILE="$LOG_DIR/app.log"
-BUILD_LOG="$LOG_DIR/build.log"
+# 创建日志文件并添加时间戳
+echo "=== Next.js项目部署开始 (${TIMESTAMP}) ===" > "$LOG_FILE"
 
-# 检查是否已经运行
-check_running() {
-    if [ -f "$PID_FILE" ]; then
-        PID=$(cat "$PID_FILE")
-        if ps -p $PID > /dev/null 2>&1; then
-            echo -e "${YELLOW}应用已在运行 (PID: $PID)${NC}"
-            return 0
-        else
-            # PID文件存在但进程不存在，删除PID文件
-            rm -f "$PID_FILE"
-        fi
-    fi
-    return 1
+# 函数：记录日志并显示进度
+log_message() {
+    local message="$1"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[${timestamp}] ${message}" | tee -a "$LOG_FILE"
 }
 
-# 创建日志目录
-create_log_dir() {
-    if [ ! -d "$LOG_DIR" ]; then
-        mkdir -p "$LOG_DIR"
-        echo -e "${GREEN}创建日志目录: $LOG_DIR${NC}"
-    fi
-}
-
-# 启动应用
-start_app() {
-    echo -e "${GREEN}开始启动 $PROJECT_NAME 生产环境...${NC}"
-
-    # 检查是否已经运行
-    if check_running; then
-        echo -e "${RED}启动失败：应用已在运行${NC}"
-        exit 1
-    fi
-
-    # 创建日志目录
-    create_log_dir
-
-    # 获取当前时间戳
-    TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-
-    echo "[$TIMESTAMP] ========== 开始构建项目 ==========" >> "$BUILD_LOG"
-
-    # 构建项目
-    echo -e "${YELLOW}正在构建项目...${NC}"
-    if npm run build >> "$BUILD_LOG" 2>&1; then
-        echo -e "${GREEN}项目构建成功${NC}"
-        echo "[$TIMESTAMP] 构建成功" >> "$BUILD_LOG"
+# 函数：检查命令执行结果
+check_result() {
+    if [ $? -eq 0 ]; then
+        log_message "✓ $1 完成"
     else
-        echo -e "${RED}项目构建失败，请查看构建日志: $BUILD_LOG${NC}"
-        echo "[$TIMESTAMP] 构建失败" >> "$BUILD_LOG"
-        exit 1
-    fi
-
-    # 启动生产服务器
-    echo -e "${YELLOW}正在启动生产服务器...${NC}"
-    TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-    echo "[$TIMESTAMP] ========== 启动生产服务器 ==========" >> "$LOG_FILE"
-
-    # 使用nohup在后台启动服务器，并保存PID
-    nohup npm start >> "$LOG_FILE" 2>&1 &
-    APP_PID=$!
-
-    # 保存PID到文件
-    echo $APP_PID > "$PID_FILE"
-
-    # 等待一下确保启动成功
-    sleep 3
-
-    if ps -p $APP_PID > /dev/null 2>&1; then
-        echo -e "${GREEN}✅ 应用启动成功！${NC}"
-        echo -e "${GREEN}PID: $APP_PID${NC}"
-        echo -e "${GREEN}日志文件: $LOG_FILE${NC}"
-        echo -e "${GREEN}构建日志: $BUILD_LOG${NC}"
-        echo -e "${YELLOW}使用 './stop.sh' 停止应用${NC}"
-        echo -e "${YELLOW}使用 './status.sh' 查看状态${NC}"
-
-        TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-        echo "[$TIMESTAMP] 应用启动成功 (PID: $APP_PID)" >> "$LOG_FILE"
-    else
-        echo -e "${RED}❌ 应用启动失败，请查看日志: $LOG_FILE${NC}"
-        rm -f "$PID_FILE"
+        log_message "✗ $1 失败"
         exit 1
     fi
 }
 
-# 显示帮助信息
-show_help() {
-    echo "用法: $0 [选项]"
-    echo ""
-    echo "选项:"
-    echo "  start     启动应用 (默认)"
-    echo "  help      显示此帮助信息"
-    echo ""
-    echo "相关脚本:"
-    echo "  ./stop.sh    停止应用"
-    echo "  ./status.sh  查看应用状态"
-}
+# 在后台运行部署过程
+{
+    log_message "开始Next.js项目部署流程..."
 
-# 主程序
-main() {
-    case "${1:-start}" in
-        "start")
-            start_app
-            ;;
-        "help"|"-h"|"--help")
-            show_help
-            ;;
-        *)
-            echo -e "${RED}未知选项: $1${NC}"
-            show_help
-            exit 1
-            ;;
-    esac
-}
+    # 1. 安装依赖
+    log_message "正在安装依赖 (npm install)..."
+    npm install >> "$LOG_FILE" 2>&1
+    check_result "依赖安装"
 
-main "$@"
+    # 2. 构建项目
+    log_message "正在构建项目 (npm run build)..."
+    npm run build >> "$LOG_FILE" 2>&1
+    check_result "项目构建"
+
+    # 3. 启动项目
+    log_message "正在启动项目 (npm run start)..."
+    log_message "Next.js服务已启动，可以通过浏览器访问项目"
+    log_message "查看实时日志: tail -f ${LOG_FILE}"
+    npm run start >> "$LOG_FILE" 2>&1
+
+} &
+
+# 获取后台进程的PID
+DEPLOY_PID=$!
+echo "部署进程已在后台运行，PID: ${DEPLOY_PID}"
+echo "日志文件: ${LOG_FILE}"
+echo "要停止服务，可以运行: kill ${DEPLOY_PID}"
+
+# 保存PID到文件，便于后续管理
+echo $DEPLOY_PID > "${SCRIPT_DIR}/nextjs.pid"
+log_message "部署进程PID已保存: ${DEPLOY_PID}"
+
+# 显示如何使用tail命令查看日志
+echo ""
+echo "要查看实时日志，请运行: tail -f ${LOG_FILE}"
+echo "要停止服务，请运行: kill $(cat ${SCRIPT_DIR}/nextjs.pid) && rm ${SCRIPT_DIR}/nextjs.pid"
