@@ -10,9 +10,13 @@ import '@/styles/themes.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      document.documentElement.setAttribute('data-theme', theme);
+    const storedTheme = localStorage.getItem('theme');
+    const resolvedTheme = storedTheme || 'dracula';
+
+    document.documentElement.setAttribute('data-theme', resolvedTheme);
+
+    if (!storedTheme) {
+      localStorage.setItem('theme', resolvedTheme);
     }
   }, []);
 
