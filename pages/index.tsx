@@ -278,7 +278,6 @@ export default function HomePage() {
                     <button
                       type="button"
                       className={`${styles.audioControlButton} amplitude-play-pause`}
-                      data-amplitude-song-index="0"
                       aria-label={isPlaying ? 'Pause track' : 'Play track'}
                     >
                       {isPlaying ? <FiPause /> : <FiPlay />}
