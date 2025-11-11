@@ -1,9 +1,7 @@
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FiPlay, FiPause, FiSkipBack, FiSkipForward, FiShuffle } from 'react-icons/fi';
 import styles from '@/styles/HomePage.module.css';
-import { useAmplitudePlayer } from '@/contexts/AmplitudePlayerContext';
-import type { Track } from '@/contexts/AmplitudePlayerContext';
 
 type MusicBrief = {
   id: number;
@@ -18,6 +16,15 @@ type MusicListResponse = {
 type MusicInfoResponse = MusicBrief & {
   music_url: string;
   thumbnail_url: string;
+};
+
+type Track = {
+  id?: number;
+  name: string;
+  artist: string;
+  album?: string;
+  url: string;
+  cover_art_url: string;
 };
 
 const ENV_BACKEND_BASE_URL = (
@@ -60,18 +67,26 @@ const ensureAbsoluteUrl = (input: string, base: string) => {
   return `${normalizedBase}${normalizedPath}`;
 };
 
+const FALLBACK_TRACK: Track = {
+  name: 'Neon Skyline',
+  artist: 'Syn City FM',
+  album: 'Terminal Dreams',
+  url: 'https://cdn.pixabay.com/download/audio/2024/05/25/audio_a0f651350a.mp3?filename=the-grid-2077-198564.mp3',
+  cover_art_url: '/themes/dracula.png',
+};
+
 export default function HomePage() {
   const [activeLineIndex, setActiveLineIndex] = useState(0);
-  const {
-    playlist,
-    setPlaylist,
-    currentSong,
-    isPlaying,
-    isShuffling,
-    setIsShuffling,
-    progressPercent,
-    fallbackTrack,
-  } = useAmplitudePlayer();
+  const [playlist, setPlaylist] = useState<Track[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isShuffling, setIsShuffling] = useState(false);
+  const [progressPercent, setProgressPercent] = useState(0);
+  const fallbackTrack = FALLBACK_TRACK;
+  const currentSong = useMemo(
+    () => playlist[currentIndex] ?? fallbackTrack,
+    [playlist, currentIndex, fallbackTrack]
+  );
 
   const codeLines = [
     { code: 'const HomePage = () => {', type: 'function' },
@@ -128,6 +143,9 @@ export default function HomePage() {
         if (listPayload.musics.length === 0) {
           if (isMounted) {
             setPlaylist([]);
+            setCurrentIndex(0);
+            setProgressPercent(0);
+            setIsPlaying(false);
           }
           return;
         }
@@ -155,6 +173,9 @@ export default function HomePage() {
 
         if (isMounted) {
           setPlaylist(tracks);
+          setCurrentIndex(0);
+          setProgressPercent(0);
+          setIsPlaying(false);
         }
       } catch (error) {
         if (controller.signal.aborted || !isMounted) {
@@ -162,6 +183,9 @@ export default function HomePage() {
         }
         console.error('Failed to load music playlist', error);
         setPlaylist([fallbackTrack]);
+        setCurrentIndex(0);
+        setProgressPercent(0);
+        setIsPlaying(false);
       }
     };
 
@@ -171,37 +195,61 @@ export default function HomePage() {
       isMounted = false;
       controller.abort();
     };
-  }, [fallbackTrack, playlist.length, setPlaylist]);
+  }, [fallbackTrack, playlist.length]);
 
   useEffect(() => {
-    let isMounted = true;
+    setProgressPercent(0);
+  }, [currentIndex]);
 
-    const rebindAmplitudeControls = async () => {
-      try {
-        const amplitudeModule = await import('amplitudejs');
-        if (!isMounted) {
-          return;
-        }
+  useEffect(() => {
+    if (!isPlaying) {
+      return;
+    }
 
-        const Amplitude = amplitudeModule.default ?? amplitudeModule;
-        const bindNewElements = (Amplitude as { bindNewElements?: () => void }).bindNewElements;
+    const interval = window.setInterval(() => {
+      setProgressPercent((prev) => (prev >= 100 ? 0 : prev + 1));
+    }, 2000);
 
-        if (typeof bindNewElements === 'function') {
-          bindNewElements();
-        }
-      } catch (error) {
-        console.error('Failed to bind audio player controls', error);
+    return () => window.clearInterval(interval);
+  }, [isPlaying]);
+
+  const selectTrack = (nextIndex: number) => {
+    if (playlist.length === 0) {
+      return;
+    }
+
+    const normalizedIndex = ((nextIndex % playlist.length) + playlist.length) % playlist.length;
+    setCurrentIndex(normalizedIndex);
+  };
+
+  const handlePrevTrack = () => {
+    selectTrack(currentIndex - 1);
+  };
+
+  const handleNextTrack = () => {
+    if (playlist.length === 0) {
+      return;
+    }
+
+    if (isShuffling && playlist.length > 1) {
+      let randomIndex = currentIndex;
+      while (randomIndex === currentIndex) {
+        randomIndex = Math.floor(Math.random() * playlist.length);
       }
-    };
+      selectTrack(randomIndex);
+      return;
+    }
 
-    rebindAmplitudeControls();
+    selectTrack(currentIndex + 1);
+  };
 
-    return () => {
-      isMounted = false;
-    };
-  }, [playlist]);
+  const handlePlayPause = () => {
+    setIsPlaying((prev) => !prev);
+  };
 
-  // audio playback is handled globally by AmplitudePlayerProvider
+  const handleShuffleToggle = () => {
+    setIsShuffling((prev) => !prev);
+  };
 
   return (
     <div className={styles.heroLayout}>
@@ -270,31 +318,35 @@ export default function HomePage() {
                   <div className={styles.audioControlsRow}>
                     <button
                       type="button"
-                      className={`${styles.audioControlButton} amplitude-prev`}
+                      className={styles.audioControlButton}
                       aria-label="Previous track"
+                      onClick={handlePrevTrack}
                     >
                       <FiSkipBack />
                     </button>
                     <button
                       type="button"
-                      className={`${styles.audioControlButton} amplitude-play-pause`}
+                      className={styles.audioControlButton}
                       aria-label={isPlaying ? 'Pause track' : 'Play track'}
+                      aria-pressed={isPlaying}
+                      onClick={handlePlayPause}
                     >
                       {isPlaying ? <FiPause /> : <FiPlay />}
                     </button>
                     <button
                       type="button"
-                      className={`${styles.audioControlButton} amplitude-next`}
+                      className={styles.audioControlButton}
                       aria-label="Next track"
+                      onClick={handleNextTrack}
                     >
                       <FiSkipForward />
                     </button>
                     <button
                       type="button"
-                      className={`${styles.audioControlButton} ${isShuffling ? styles.audioControlActive : ''} amplitude-shuffle`}
+                      className={`${styles.audioControlButton} ${isShuffling ? styles.audioControlActive : ''}`}
                       aria-label="Toggle shuffle"
                       aria-pressed={isShuffling}
-                      onClick={() => setIsShuffling((prev) => !prev)}
+                      onClick={handleShuffleToggle}
                     >
                       <FiShuffle />
                     </button>
