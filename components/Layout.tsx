@@ -29,7 +29,7 @@ const Layout = ({ children }: LayoutProps) => {
       <div className={styles.main}>
         <Sidebar />
         <Explorer />
-        <div style={{ width: '100%' }}>
+        <div className={styles.editorColumn}>
           <Tabsbar />
           <main id="main-editor" className={styles.content}>
             {children}
