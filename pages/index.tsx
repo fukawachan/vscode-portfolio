@@ -4,11 +4,67 @@ import { FiPlay, FiPause, FiSkipBack, FiSkipForward, FiShuffle } from 'react-ico
 import styles from '@/styles/HomePage.module.css';
 
 type Track = {
+  id?: number;
   name: string;
   artist: string;
-  album: string;
+  album?: string;
   url: string;
   cover_art_url: string;
+};
+
+type MusicBrief = {
+  id: number;
+  title: string;
+  artist: string;
+};
+
+type MusicListResponse = {
+  musics: MusicBrief[];
+};
+
+type MusicInfoResponse = MusicBrief & {
+  music_url: string;
+  thumbnail_url: string;
+};
+
+const ENV_BACKEND_BASE_URL = (
+  process.env.NEXT_PUBLIC_BACKEND_BASE_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  ''
+).replace(/\/$/, '');
+
+const DEFAULT_BACKEND_BASE_URL = 'http://127.0.0.1:8000';
+const ABSOLUTE_URL_REGEX = /^https?:\/\//i;
+
+const resolveBackendBaseUrl = () => {
+  if (ENV_BACKEND_BASE_URL) {
+    return ENV_BACKEND_BASE_URL;
+  }
+
+  if (typeof window !== 'undefined') {
+    const { origin, hostname } = window.location;
+    if (/localhost|127\.0\.0\.1/i.test(hostname)) {
+      return DEFAULT_BACKEND_BASE_URL;
+    }
+    return origin.replace(/\/$/, '');
+  }
+
+  return DEFAULT_BACKEND_BASE_URL;
+};
+
+const ensureAbsoluteUrl = (input: string, base: string) => {
+  const normalizedBase = base.replace(/\/$/, '');
+
+  if (!input) {
+    return normalizedBase;
+  }
+
+  if (ABSOLUTE_URL_REGEX.test(input)) {
+    return input;
+  }
+
+  const normalizedPath = input.startsWith('/') ? input : `/${input}`;
+  return `${normalizedBase}${normalizedPath}`;
 };
 
 type AmplitudeClient = {
@@ -20,42 +76,16 @@ type AmplitudeClient = {
 
 export default function HomePage() {
   const [activeLineIndex, setActiveLineIndex] = useState(0);
-  const playlist = useMemo<Track[]>(
-    () => [
-      {
-        name: 'Neon Skyline',
-        artist: 'Syn City FM',
-        album: 'Terminal Dreams',
-        url: 'https://cdn.pixabay.com/download/audio/2024/05/25/audio_a0f651350a.mp3?filename=the-grid-2077-198564.mp3',
-        cover_art_url: '/themes/dracula.png',
-      },
-      {
-        name: 'Binary Sunset',
-        artist: 'Analog Heart',
-        album: 'Waveforms',
-        url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_18d61bdd73.mp3?filename=the-futuristic-13463.mp3',
-        cover_art_url: '/themes/night-owl.png',
-      },
-      {
-        name: 'Circuit Bloom',
-        artist: 'Data Garden',
-        album: 'LoFi Terminal',
-        url: 'https://cdn.pixabay.com/download/audio/2023/02/14/audio_b3c79e7d90.mp3?filename=downtown-14675.mp3',
-        cover_art_url: '/themes/nord.png',
-      },
-    ],
-    []
-  );
+  const [playlist, setPlaylist] = useState<Track[]>([]);
   const fallbackTrack = useMemo<Track>(
-    () =>
-      playlist[0] ?? {
-        name: 'Boot Sequence',
-        artist: 'System BIOS',
-        album: 'Init Sequence',
-        url: '',
-        cover_art_url: '/themes/ayu.png',
-      },
-    [playlist]
+    () => ({
+      name: 'Neon Skyline',
+      artist: 'Syn City FM',
+      album: 'Terminal Dreams',
+      url: 'https://cdn.pixabay.com/download/audio/2024/05/25/audio_a0f651350a.mp3?filename=the-grid-2077-198564.mp3',
+      cover_art_url: '/themes/dracula.png',
+    }),
+    []
   );
   const [currentSong, setCurrentSong] = useState<Track>(() => fallbackTrack);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -94,15 +124,91 @@ export default function HomePage() {
   }, [codeLines.length]);
 
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const loadPlaylist = async () => {
+      try {
+        const baseUrl = resolveBackendBaseUrl();
+        const listResponse = await fetch(ensureAbsoluteUrl('api/music/list', baseUrl), {
+          signal: controller.signal,
+        });
+
+        if (!listResponse.ok) {
+          throw new Error(`Failed to fetch music list (${listResponse.status})`);
+        }
+
+        const listPayload = (await listResponse.json()) as MusicListResponse;
+        if (listPayload.musics.length === 0) {
+          if (isMounted) {
+            setPlaylist([]);
+            setCurrentSong(fallbackTrack);
+            setIsPlaying(false);
+          }
+          return;
+        }
+
+        const tracks = await Promise.all(
+          listPayload.musics.map(async ({ id }) => {
+            const infoResponse = await fetch(ensureAbsoluteUrl(`api/music/info/${id}`, baseUrl), {
+              signal: controller.signal,
+            });
+
+            if (!infoResponse.ok) {
+              throw new Error(`Failed to fetch music info ${id} (${infoResponse.status})`);
+            }
+
+            const infoPayload = (await infoResponse.json()) as MusicInfoResponse;
+            return {
+              id: infoPayload.id,
+              name: infoPayload.title,
+              artist: infoPayload.artist,
+              url: ensureAbsoluteUrl(infoPayload.music_url, baseUrl),
+              cover_art_url: ensureAbsoluteUrl(infoPayload.thumbnail_url, baseUrl),
+            };
+          })
+        );
+
+        if (isMounted) {
+          setPlaylist(tracks);
+          setCurrentSong(tracks[0] ?? fallbackTrack);
+          setIsPlaying(false);
+        }
+      } catch (error) {
+        if (controller.signal.aborted || !isMounted) {
+          return;
+        }
+        console.error('Failed to load music playlist', error);
+        setPlaylist([fallbackTrack]);
+        setCurrentSong(fallbackTrack);
+        setIsPlaying(false);
+      }
+    };
+
+    loadPlaylist();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [fallbackTrack]);
+
+  useEffect(() => {
+    if (playlist.length === 0) {
+      setCurrentSong(fallbackTrack);
+      return;
+    }
+
     let amplitudeInstance: AmplitudeClient | null = null;
     let isMounted = true;
+    const baseTrack = playlist[0] ?? fallbackTrack;
 
     const mapMetadata = (meta?: Partial<Track>): Track => ({
-      name: meta?.name ?? fallbackTrack.name,
-      artist: meta?.artist ?? fallbackTrack.artist,
-      album: meta?.album ?? fallbackTrack.album,
-      url: meta?.url ?? fallbackTrack.url,
-      cover_art_url: meta?.cover_art_url ?? fallbackTrack.cover_art_url,
+      name: meta?.name ?? baseTrack.name,
+      artist: meta?.artist ?? baseTrack.artist,
+      album: meta?.album ?? baseTrack.album,
+      url: meta?.url ?? baseTrack.url,
+      cover_art_url: meta?.cover_art_url ?? baseTrack.cover_art_url,
     });
 
     const initAmplitude = async () => {
@@ -130,6 +236,8 @@ export default function HomePage() {
         setIsPlaying(playing);
       };
 
+      setIsPlaying(false);
+      setCurrentSong(baseTrack);
       Amplitude.init({
         songs: playlist,
         continue_next: true,
@@ -195,6 +303,7 @@ export default function HomePage() {
                     alt={`${currentSong.name} cover art`}
                     className={styles.audioCover}
                     priority
+                    unoptimized
                   />
                   <button
                     type="button"
@@ -210,7 +319,8 @@ export default function HomePage() {
                   <span className={styles.audioMetaLabel}>now streaming</span>
                   <h3 className={styles.audioTrackTitle}>{currentSong.name}</h3>
                   <p className={styles.audioTrackInfo}>
-                    {currentSong.artist} · {currentSong.album}
+                    {currentSong.artist}
+                    {currentSong.album ? ` · ${currentSong.album}` : ''}
                   </p>
 
                   <div className={styles.audioProgressShell}>
