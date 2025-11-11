@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app';
 
 import Layout from '@/components/Layout';
 import Head from '@/components/Head';
+import { AmplitudePlayerProvider } from '@/contexts/AmplitudePlayerContext';
 
 import '@/styles/globals.css';
 import '@/styles/themes.css';
@@ -16,10 +17,12 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <Layout>
-      <Head title={'Lovely Songs for Lovely People'} />
-      <Component {...pageProps} />
-    </Layout>
+    <AmplitudePlayerProvider>
+      <Layout>
+        <Head title={'Lovely Songs for Lovely People'} />
+        <Component {...pageProps} />
+      </Layout>
+    </AmplitudePlayerProvider>
   );
 }
 

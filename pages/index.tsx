@@ -1,16 +1,9 @@
 import Image from 'next/image';
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { FiPlay, FiPause, FiSkipBack, FiSkipForward, FiShuffle } from 'react-icons/fi';
 import styles from '@/styles/HomePage.module.css';
-
-type Track = {
-  id?: number;
-  name: string;
-  artist: string;
-  album?: string;
-  url: string;
-  cover_art_url: string;
-};
+import { useAmplitudePlayer } from '@/contexts/AmplitudePlayerContext';
+import type { Track } from '@/contexts/AmplitudePlayerContext';
 
 type MusicBrief = {
   id: number;
@@ -67,31 +60,18 @@ const ensureAbsoluteUrl = (input: string, base: string) => {
   return `${normalizedBase}${normalizedPath}`;
 };
 
-type AmplitudeClient = {
-  init: (config: { songs: Track[]; callbacks?: Record<string, () => void>; [key: string]: unknown }) => void;
-  destroy?: () => void;
-  stop?: () => void;
-  getActiveSongMetadata?: () => Partial<Track>;
-  getSongPlayedPercentage?: () => number;
-};
-
 export default function HomePage() {
   const [activeLineIndex, setActiveLineIndex] = useState(0);
-  const [playlist, setPlaylist] = useState<Track[]>([]);
-  const fallbackTrack = useMemo<Track>(
-    () => ({
-      name: 'Neon Skyline',
-      artist: 'Syn City FM',
-      album: 'Terminal Dreams',
-      url: 'https://cdn.pixabay.com/download/audio/2024/05/25/audio_a0f651350a.mp3?filename=the-grid-2077-198564.mp3',
-      cover_art_url: '/themes/dracula.png',
-    }),
-    []
-  );
-  const [currentSong, setCurrentSong] = useState<Track>(() => fallbackTrack);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isShuffling, setIsShuffling] = useState(false);
-  const [progressPercent, setProgressPercent] = useState(0);
+  const {
+    playlist,
+    setPlaylist,
+    currentSong,
+    isPlaying,
+    isShuffling,
+    setIsShuffling,
+    progressPercent,
+    fallbackTrack,
+  } = useAmplitudePlayer();
 
   const codeLines = [
     { code: 'const HomePage = () => {', type: 'function' },
@@ -126,6 +106,10 @@ export default function HomePage() {
   }, [codeLines.length]);
 
   useEffect(() => {
+    if (playlist.length > 0) {
+      return;
+    }
+
     let isMounted = true;
     const controller = new AbortController();
 
@@ -144,13 +128,11 @@ export default function HomePage() {
         if (listPayload.musics.length === 0) {
           if (isMounted) {
             setPlaylist([]);
-            setCurrentSong(fallbackTrack);
-            setIsPlaying(false);
           }
           return;
         }
 
-        const tracks = await Promise.all(
+        const tracks: Track[] = await Promise.all(
           listPayload.musics.map(async ({ id }) => {
             const infoResponse = await fetch(ensureAbsoluteUrl(`api/music/info/${id}`, baseUrl), {
               signal: controller.signal,
@@ -173,8 +155,6 @@ export default function HomePage() {
 
         if (isMounted) {
           setPlaylist(tracks);
-          setCurrentSong(tracks[0] ?? fallbackTrack);
-          setIsPlaying(false);
         }
       } catch (error) {
         if (controller.signal.aborted || !isMounted) {
@@ -182,8 +162,6 @@ export default function HomePage() {
         }
         console.error('Failed to load music playlist', error);
         setPlaylist([fallbackTrack]);
-        setCurrentSong(fallbackTrack);
-        setIsPlaying(false);
       }
     };
 
@@ -193,108 +171,9 @@ export default function HomePage() {
       isMounted = false;
       controller.abort();
     };
-  }, [fallbackTrack]);
+  }, [fallbackTrack, playlist.length, setPlaylist]);
 
-  useEffect(() => {
-    if (playlist.length === 0) {
-      setCurrentSong(fallbackTrack);
-      setProgressPercent(0);
-      return;
-    }
-
-    let amplitudeInstance: AmplitudeClient | null = null;
-    let isMounted = true;
-    const baseTrack = playlist[0] ?? fallbackTrack;
-
-    const mapMetadata = (meta?: Partial<Track>): Track => ({
-      name: meta?.name ?? baseTrack.name,
-      artist: meta?.artist ?? baseTrack.artist,
-      album: meta?.album ?? baseTrack.album,
-      url: meta?.url ?? baseTrack.url,
-      cover_art_url: meta?.cover_art_url ?? baseTrack.cover_art_url,
-    });
-
-    const clampProgress = (value: number) => Math.min(100, Math.max(0, value));
-
-    const resetProgress = () => {
-      if (!isMounted) {
-        return;
-      }
-      setProgressPercent(0);
-    };
-
-    const initAmplitude = async () => {
-      const amplitudeModule = await import('amplitudejs');
-      if (!isMounted) {
-        return;
-      }
-
-      const Amplitude = (amplitudeModule.default ?? amplitudeModule) as AmplitudeClient;
-      amplitudeInstance = Amplitude;
-
-      const syncMetadata = () => {
-        if (!isMounted) {
-          return;
-        }
-
-        const meta = Amplitude.getActiveSongMetadata?.();
-        setCurrentSong(mapMetadata(meta));
-      };
-
-      const updatePlaying = (playing: boolean) => {
-        if (!isMounted) {
-          return;
-        }
-        setIsPlaying(playing);
-      };
-
-      const handleTimeUpdate = () => {
-        if (!isMounted) {
-          return;
-        }
-        const percent = Number(Amplitude.getSongPlayedPercentage?.());
-        if (!Number.isFinite(percent)) {
-          return;
-        }
-        setProgressPercent(clampProgress(percent));
-      };
-
-      const handleSongChange = () => {
-        resetProgress();
-        syncMetadata();
-      };
-
-      setIsPlaying(false);
-      setCurrentSong(baseTrack);
-      resetProgress();
-      Amplitude.init({
-        songs: playlist,
-        continue_next: true,
-        autoplay: false,
-        callbacks: {
-          play: () => updatePlaying(true),
-          pause: () => updatePlaying(false),
-          stop: () => {
-            updatePlaying(false);
-            resetProgress();
-          },
-          song_change: handleSongChange,
-          timeupdate: handleTimeUpdate,
-        },
-      });
-
-      syncMetadata();
-    };
-
-    initAmplitude();
-
-    return () => {
-      resetProgress();
-      isMounted = false;
-      amplitudeInstance?.stop?.();
-      amplitudeInstance?.destroy?.();
-    };
-  }, [fallbackTrack, playlist]);
+  // audio playback is handled globally by AmplitudePlayerProvider
 
   return (
     <div className={styles.heroLayout}>
