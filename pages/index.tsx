@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FiPlay, FiPause, FiSkipBack, FiSkipForward, FiShuffle } from 'react-icons/fi';
 import styles from '@/styles/HomePage.module.css';
 
@@ -87,6 +87,7 @@ export default function HomePage() {
     () => playlist[currentIndex] ?? fallbackTrack,
     [playlist, currentIndex, fallbackTrack]
   );
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const codeLines = [
     { code: 'const HomePage = () => {', type: 'function' },
@@ -201,47 +202,109 @@ export default function HomePage() {
     setProgressPercent(0);
   }, [currentIndex]);
 
-  useEffect(() => {
-    if (!isPlaying) {
-      return;
-    }
-
-    const interval = window.setInterval(() => {
-      setProgressPercent((prev) => (prev >= 100 ? 0 : prev + 1));
-    }, 2000);
-
-    return () => window.clearInterval(interval);
-  }, [isPlaying]);
-
-  const selectTrack = (nextIndex: number) => {
+  const handlePrevTrack = useCallback(() => {
     if (playlist.length === 0) {
       return;
     }
 
-    const normalizedIndex = ((nextIndex % playlist.length) + playlist.length) % playlist.length;
-    setCurrentIndex(normalizedIndex);
-  };
+    setCurrentIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
+  }, [playlist.length]);
 
-  const handlePrevTrack = () => {
-    selectTrack(currentIndex - 1);
-  };
-
-  const handleNextTrack = () => {
+  const handleNextTrack = useCallback(() => {
     if (playlist.length === 0) {
       return;
     }
 
-    if (isShuffling && playlist.length > 1) {
-      let randomIndex = currentIndex;
-      while (randomIndex === currentIndex) {
-        randomIndex = Math.floor(Math.random() * playlist.length);
+    setCurrentIndex((prev) => {
+      if (isShuffling && playlist.length > 1) {
+        let randomIndex = prev;
+        while (randomIndex === prev) {
+          randomIndex = Math.floor(Math.random() * playlist.length);
+        }
+        return randomIndex;
       }
-      selectTrack(randomIndex);
+
+      return (prev + 1) % playlist.length;
+    });
+  }, [isShuffling, playlist.length]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
       return;
     }
 
-    selectTrack(currentIndex + 1);
-  };
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.preload = 'auto';
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+
+    audio.src = currentSong.url;
+    audio.currentTime = 0;
+    setProgressPercent(0);
+  }, [currentSong.url]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+
+    if (isPlaying) {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error('Unable to start playback', error);
+          setIsPlaying(false);
+        });
+      }
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, currentSong.url]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+
+    const handleTimeUpdate = () => {
+      if (!audio.duration || Number.isNaN(audio.duration)) {
+        setProgressPercent(0);
+        return;
+      }
+
+      setProgressPercent((audio.currentTime / audio.duration) * 100);
+    };
+
+    const handleEnded = () => {
+      setProgressPercent(0);
+      handleNextTrack();
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [handleNextTrack]);
 
   const handlePlayPause = () => {
     setIsPlaying((prev) => !prev);
