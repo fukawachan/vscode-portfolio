@@ -523,6 +523,10 @@
   position: relative;
   z-index: 2;
   min-height: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75lh;
 }
 
 /* Terminal Text Styles */
@@ -551,42 +555,39 @@
 }
 
 .terminalVideoShell {
-  margin: 1.5lh 0 0;
-  border: 1px solid rgba(100, 255, 100, 0.3);
-  border-radius: 12px;
+  margin: 1lh 0 0;
+  border: none;
+  border-radius: 0;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.45),
-    inset 0 0 30px rgba(0, 0, 0, 0.6);
+  background: transparent;
+  box-shadow: none;
   pointer-events: none;
   position: relative;
   isolation: isolate;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  max-height: 100%;
+  width: 100%;
 }
 
 .terminalVideoShell::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at 20% 20%,
-    rgba(100, 255, 100, 0.15),
-    transparent 65%
-  );
-  mix-blend-mode: screen;
-  opacity: 0.5;
-  pointer-events: none;
-  z-index: 1;
+  content: none;
 }
 
 .terminalVideo {
   display: block;
   width: 100%;
+  max-width: 100%;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
   filter: contrast(1.08) saturate(0.85);
-  opacity: 0.9;
-  mix-blend-mode: screen;
+  opacity: 0.95;
+  mix-blend-mode: normal;
   position: relative;
   z-index: 0;
   pointer-events: none;
