@@ -88,7 +88,14 @@
 /* Right Panel Upper Section - Original Style */
 .rightPanelUpper {
   flex: 1;
-  background-color: rgba(0, 0, 0, 0.15) !important;
+  background-color: #030014; /* Fallback for older browsers */
+  background-image: radial-gradient(
+      circle at 20% 20%,
+      rgba(120, 0, 255, 0.35),
+      transparent 45%
+    ),
+    radial-gradient(circle at 80% 0%, rgba(0, 145, 255, 0.4), transparent 50%),
+    linear-gradient(135deg, #050014 0%, #090334 55%, #001038 100%);
   color: rgba(255, 255, 255, 0.06);
   font-size: 13px;
   line-height: 1.5;
@@ -102,6 +109,10 @@
   display: flex;
   align-items: stretch;
   justify-content: center;
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.65),
+    inset 0 0 25px rgba(0, 24, 69, 0.6),
+    0 0 35px rgba(42, 0, 94, 0.45);
 }
 
 .audioPlayerWrapper {
