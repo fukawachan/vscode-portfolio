@@ -321,25 +321,22 @@ export default function HomePage() {
             <div className={styles.terminalContent}>
               <div className={styles.terminalLine}>
                 <span className={styles.terminalPrompt}>user@portfolio:~$</span>
-                <span className={styles.terminalCommand}> whoami</span>
+                <span className={styles.terminalCommand}>
+                  {' open ./public/vidoes/background_video.mp4'}
+                </span>
               </div>
-              <div className={styles.terminalOutput}>
-                Name: 复川
-                <br />
-                Role: 赛博调酒师
-                <br />
-                Bio: A believing heart is your magic
-              </div>
-              <div className={styles.terminalLine}>
-                <span className={styles.terminalPrompt}>user@portfolio:~$</span>
-                <span className={styles.terminalCommand}> ls -la projects/</span>
-              </div>
-              <div className={styles.terminalOutput}>
-                drwxr-xr-x 12 user staff 384 Nov 11 10:30 .
-                <br />
-                -rw-r--r-- 1 user staff 2.4K Nov 10 15:20 portfolio.tsx
-                <br />
-                -rw-r--r-- 1 user staff 1.8K Nov 09 14:15 blog.md
+              <div className={styles.terminalVideoShell} aria-hidden="true">
+                <video
+                  className={styles.terminalVideo}
+                  src="/vidoes/background_video.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  controls={false}
+                  tabIndex={-1}
+                />
               </div>
             </div>
           </div>
