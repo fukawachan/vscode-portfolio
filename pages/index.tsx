@@ -173,6 +173,34 @@ export default function HomePage() {
     };
   }, [fallbackTrack, playlist.length, setPlaylist]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const rebindAmplitudeControls = async () => {
+      try {
+        const amplitudeModule = await import('amplitudejs');
+        if (!isMounted) {
+          return;
+        }
+
+        const Amplitude = amplitudeModule.default ?? amplitudeModule;
+        const bindNewElements = (Amplitude as { bindNewElements?: () => void }).bindNewElements;
+
+        if (typeof bindNewElements === 'function') {
+          bindNewElements();
+        }
+      } catch (error) {
+        console.error('Failed to bind audio player controls', error);
+      }
+    };
+
+    rebindAmplitudeControls();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [playlist]);
+
   // audio playback is handled globally by AmplitudePlayerProvider
 
   return (
