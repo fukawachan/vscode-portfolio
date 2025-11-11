@@ -72,6 +72,7 @@ type AmplitudeClient = {
   destroy?: () => void;
   stop?: () => void;
   getActiveSongMetadata?: () => Partial<Track>;
+  getSongPlayedPercentage?: () => number;
 };
 
 export default function HomePage() {
@@ -90,6 +91,7 @@ export default function HomePage() {
   const [currentSong, setCurrentSong] = useState<Track>(() => fallbackTrack);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isShuffling, setIsShuffling] = useState(false);
+  const [progressPercent, setProgressPercent] = useState(0);
 
   const codeLines = [
     { code: 'const HomePage = () => {', type: 'function' },
@@ -196,6 +198,7 @@ export default function HomePage() {
   useEffect(() => {
     if (playlist.length === 0) {
       setCurrentSong(fallbackTrack);
+      setProgressPercent(0);
       return;
     }
 
@@ -210,6 +213,15 @@ export default function HomePage() {
       url: meta?.url ?? baseTrack.url,
       cover_art_url: meta?.cover_art_url ?? baseTrack.cover_art_url,
     });
+
+    const clampProgress = (value: number) => Math.min(100, Math.max(0, value));
+
+    const resetProgress = () => {
+      if (!isMounted) {
+        return;
+      }
+      setProgressPercent(0);
+    };
 
     const initAmplitude = async () => {
       const amplitudeModule = await import('amplitudejs');
@@ -236,8 +248,25 @@ export default function HomePage() {
         setIsPlaying(playing);
       };
 
+      const handleTimeUpdate = () => {
+        if (!isMounted) {
+          return;
+        }
+        const percent = Number(Amplitude.getSongPlayedPercentage?.());
+        if (!Number.isFinite(percent)) {
+          return;
+        }
+        setProgressPercent(clampProgress(percent));
+      };
+
+      const handleSongChange = () => {
+        resetProgress();
+        syncMetadata();
+      };
+
       setIsPlaying(false);
       setCurrentSong(baseTrack);
+      resetProgress();
       Amplitude.init({
         songs: playlist,
         continue_next: true,
@@ -245,8 +274,12 @@ export default function HomePage() {
         callbacks: {
           play: () => updatePlaying(true),
           pause: () => updatePlaying(false),
-          stop: () => updatePlaying(false),
-          song_change: syncMetadata,
+          stop: () => {
+            updatePlaying(false);
+            resetProgress();
+          },
+          song_change: handleSongChange,
+          timeupdate: handleTimeUpdate,
         },
       });
 
@@ -256,6 +289,7 @@ export default function HomePage() {
     initAmplitude();
 
     return () => {
+      resetProgress();
       isMounted = false;
       amplitudeInstance?.stop?.();
       amplitudeInstance?.destroy?.();
@@ -301,18 +335,10 @@ export default function HomePage() {
                     width={220}
                     height={220}
                     alt={`${currentSong.name} cover art`}
-                    className={styles.audioCover}
+                    className={`${styles.audioCover} ${isPlaying ? styles.audioCoverSpinning : ''}`}
                     priority
                     unoptimized
                   />
-                  <button
-                    type="button"
-                    className={`${styles.audioPlayButton} amplitude-play-pause`}
-                    data-amplitude-song-index="0"
-                    aria-label={isPlaying ? 'Pause track' : 'Play track'}
-                  >
-                    {isPlaying ? <FiPause /> : <FiPlay />}
-                  </button>
                 </div>
 
                 <div className={styles.audioTrackMeta}>
@@ -325,8 +351,12 @@ export default function HomePage() {
 
                   <div className={styles.audioProgressShell}>
                     <div
-                      className={`${styles.audioProgressFill} amplitude-song-played-progress`}
-                      data-amplitude-song-played-progress
+                      className={styles.audioProgressFill}
+                      style={{ width: `${progressPercent}%` }}
+                      role="progressbar"
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={Math.round(progressPercent)}
                     />
                   </div>
 
