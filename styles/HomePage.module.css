@@ -94,10 +94,263 @@
   line-height: 1.5;
   padding: 0;
   overflow: hidden;
-  white-space: pre;
+  white-space: normal;
   font-family: 'Zpix', monospace;
   border: none;
   box-sizing: border-box;
+  pointer-events: auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.audioPlayerWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  color: rgba(219, 255, 211, 0.95);
+  pointer-events: auto;
+  background: radial-gradient(
+      circle at 20% 20%,
+      rgba(60, 255, 190, 0.15),
+      transparent 45%
+    ),
+    radial-gradient(circle at 80% 0%, rgba(255, 88, 221, 0.08), transparent 55%),
+    rgba(5, 10, 15, 0.65);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.45);
+}
+
+.audioPlayerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(167, 255, 167, 0.85);
+}
+
+.audioBreadcrumb {
+  padding: 0.25rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 255, 186, 0.4);
+  background: rgba(7, 15, 12, 0.7);
+  box-shadow: inset 0 0 12px rgba(120, 255, 186, 0.15);
+}
+
+.audioStreamStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.audioStatusPulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8cffb7;
+  box-shadow: 0 0 12px rgba(140, 255, 183, 0.8);
+  animation: playerPulse 1.6s ease-in-out infinite;
+}
+
+.audioPlayerBody {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.75rem;
+  flex: 1;
+}
+
+.audioCoverStack {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.audioCoverGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(110, 255, 199, 0.4), transparent 65%);
+  filter: blur(18px);
+  animation: coverGlow 4s ease-in-out infinite;
+}
+
+.audioCover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.audioPlayButton {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(8, 16, 12, 0.85);
+  color: #9dff8c;
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: playButtonFloat 3s ease-in-out infinite;
+  backdrop-filter: blur(6px);
+}
+
+.audioPlayButton:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 25px rgba(120, 255, 186, 0.4);
+}
+
+.audioTrackMeta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.audioMetaLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(130, 224, 255, 0.8);
+}
+
+.audioTrackTitle {
+  font-size: 1.5rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.audioTrackInfo {
+  margin: 0;
+  color: rgba(180, 210, 255, 0.85);
+  font-size: 0.95rem;
+}
+
+.audioProgressShell {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.audioProgressFill {
+  position: absolute;
+  inset: 0;
+  width: 15%;
+  background: linear-gradient(90deg, #6bffe1, #f86dd8);
+  box-shadow: 0 0 12px rgba(108, 255, 225, 0.55);
+  transition: width 0.2s ease;
+}
+
+.audioControlsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.audioControlButton {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(12, 20, 28, 0.65);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.audioControlButton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.audioControlButton:hover {
+  transform: translateY(-2px);
+  border-color: rgba(120, 255, 186, 0.4);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.audioControlButton:hover::after {
+  opacity: 1;
+}
+
+.audioControlActive {
+  color: #6affc2;
+  border-color: rgba(106, 255, 194, 0.8);
+  box-shadow: 0 0 20px rgba(106, 255, 194, 0.35);
+}
+
+@keyframes playerPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.35);
+    opacity: 0.1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+}
+
+@keyframes coverGlow {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes playButtonFloat {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 /* Terminal Separator - Title Bar */
@@ -680,6 +933,20 @@
   .actionLinks {
     justify-content: center;
   }
+
+  .audioPlayerBody {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .audioCoverStack {
+    width: 180px;
+    height: 180px;
+  }
+
+  .audioControlsRow {
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 768px) {
@@ -731,6 +998,24 @@
     text-align: center;
     align-items: center;
     margin-top: 1.5rem;
+  }
+
+  .audioPlayerWrapper {
+    padding: 1.25rem;
+  }
+
+  .audioPlayerBody {
+    align-items: stretch;
+  }
+
+  .audioCoverStack {
+    width: 140px;
+    height: 140px;
+  }
+
+  .audioControlsRow {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 
